@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.catsgram.model.Film;
+
 import java.util.*;
 
 @RestController
@@ -33,7 +34,7 @@ public class FilmController {
     public Film update(@Valid @RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, 
+                    HttpStatus.NOT_FOUND,
                     "Фильм с ID " + film.getId() + " не найден"
             );
         }

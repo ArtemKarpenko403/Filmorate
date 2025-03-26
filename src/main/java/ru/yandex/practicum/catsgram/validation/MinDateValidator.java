@@ -2,6 +2,7 @@ package ru.yandex.practicum.catsgram.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
 import java.time.LocalDate;
 
 public class MinDateValidator implements ConstraintValidator<MinDate, LocalDate> {
@@ -17,7 +18,7 @@ public class MinDateValidator implements ConstraintValidator<MinDate, LocalDate>
         if (value == null) {
             return true;
         }
-        
+
         if (value.isBefore(minDate)) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
