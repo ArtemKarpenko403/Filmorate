@@ -2,12 +2,11 @@ package ru.yandex.practicum.catsgram.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.catsgram.model.User;
-import ru.yandex.practicum.catsgram.exception.ValidationException;
-import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -23,8 +22,8 @@ public class UserController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User create(@Valid @RequestBody User user) {
-        checkEmailUniqueness(user.getEmail());
         user.setId(nextId++);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -35,12 +34,12 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@RequestBody User user) {
-        if (user.getId() == null || !users.containsKey(user.getId())) {
-            throw new ValidationException("Пользователь с указанным id не найден");
-        }
-        if (user.getEmail() != null && !user.getEmail().equals(users.get(user.getId()).getEmail())) {
-            checkEmailUniqueness(user.getEmail());
+    public User update(@Valid @RequestBody User user) {
+        if (!users.containsKey(user.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Пользователь с ID " + user.getId() + " не найден"
+            );
         }
         User existingUser = users.get(user.getId());
         if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
@@ -49,27 +48,5 @@ public class UserController {
         if (user.getBirthday() != null) existingUser.setBirthday(user.getBirthday());
         log.info("Обновлен пользователь: {}", existingUser);
         return existingUser;
-    }
-
-    private void validateUser(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.warn("Некорректный email: {}", user.getEmail());
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            log.warn("Некорректный логин: {}", user.getLogin());
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Некорректная дата рождения: {}", user.getBirthday());
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-    }
-
-    private void checkEmailUniqueness(String email) {
-        if (users.values().stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(email))) {
-            log.warn("Попытка добавить существующий email: {}", email);
-            throw new DuplicatedDataException("Этот имейл уже используется");
-        }
     }
 }

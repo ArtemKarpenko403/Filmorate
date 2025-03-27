@@ -4,14 +4,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.catsgram.CatsgramApplication;
+import ru.yandex.practicum.catsgram.FilmorateApplication;
 import ru.yandex.practicum.catsgram.model.Film;
 import ru.yandex.practicum.catsgram.model.User;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(
-        classes = CatsgramApplication.class,
+        classes = FilmorateApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 class ControllerValidationTest {
